@@ -12,13 +12,16 @@
     <link href="$baseDir$/css/specs2.css" rel="stylesheet" type="text/css"/>
     <link href="$baseDir$/css/tabber.css" rel="stylesheet" type="text/css" media="screen"/>
 
-    <script src="$baseDir$/javascript/tabber.js" type="text/javascript"></script>
+    <script type="text/javascript" src="$baseDir$/javascript/tabber.js"></script>
     <script type="text/javascript">
       document.write('<style type="text/css">.tabber{display:none;}</style>');
       var tabberOptions = {'manualStartup':true,'addLinkId': true};
     </script>
-    <script src="$baseDir$/javascript/run_prettify.js" type="text/javascript"></script>
-    <script src="$baseDir$/javascript/specs2.js" type="text/javascript"></script>
+    <script type="text/javascript" src="$baseDir$/javascript/run_prettify.js"></script>
+    <script type="text/javascript" src="$baseDir$/javascript/specs2.js"></script>
+    <script type="text/javascript" src="$baseDir$/javascript/tipuesearch/tipuesearch_set.js"></script>
+    <script type="text/javascript" src="$baseDir$/javascript/tipuesearch/tipuesearch_content.js"></script>
+    <script type="text/javascript" src="$baseDir$/javascript/tipuesearch/tipuesearch.js"></script>
 
 </head>
 <body>
@@ -37,6 +40,20 @@ $else$
 $endif$
 
 $body$
+
+<form action="tipue.html">
+  <input type="text" name="q" id="tipue_search_input" autocomplete="off" required>
+</form>
+<div id="tipue_search_content"></div>
+
+<script>
+$(document).ready(function() {
+  $('#tipue_search_input').tipuesearch({
+    'show': 6
+  });
+});
+</script>
+
 </div>
 </div>
 </body>
