@@ -9,6 +9,7 @@ import scala.io.Source
 import scala.io.Source._
 import xml.Nodex._
 import text.MD5
+import text.Regexes._
 
 
 /**
@@ -64,8 +65,8 @@ trait FileReader {
 
   private def fileMatchesPattern(f: File, pattern: String, verbose: Boolean = false) = {
     val filePath = "./"+f.getPath.replace("\\", "/")
-    if (verbose && f.isFile) println(filePath+" matches pattern: "+(filePath matches pattern))
-    f.isFile && (filePath matches pattern)
+    if (verbose && f.isFile) println(filePath+" matches pattern: "+(filePath matchesSafely pattern))
+    f.isFile && (filePath matchesSafely pattern)
   }
 
 

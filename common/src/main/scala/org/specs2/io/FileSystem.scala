@@ -20,6 +20,7 @@ import java.util.regex.Pattern._
 import java.util.zip.{ZipEntry, ZipInputStream}
 import java.util.regex.Matcher._
 import FileReader._
+import org.specs2.text.Regexes._
 
 /**
  * Interface for the FileSystem where effects are denoted with the "Action" type
@@ -39,7 +40,7 @@ trait FileSystem {
   /** @return true if the file path matches the pattern */
   private def fileMatchesPattern(f: File, pattern: String) = {
     val filePath = "./"+f.getPath.replace("\\", "/")
-    f.isFile && (filePath matches pattern)
+    f.isFile && (filePath matchesSafely pattern)
   }
 
   private def listFiles(path: String): Action[IndexedSeq[File]] =

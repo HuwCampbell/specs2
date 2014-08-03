@@ -3,6 +3,7 @@ package analysis
 
 import data.IncludedExcluded
 import util.Properties._
+import text.Regexes._
 /**
  * This trait allows to define expected dependencies between packages layers
  */
@@ -63,7 +64,7 @@ trait LayersAnalysis extends ClassycleDependencyFinder {
       val include = included
       val exclude = excluded
 
-      val keepFunction    = (n: String, tags: Seq[String]) => tags.exists(t => n.matches(prefixed(t)))
+      val keepFunction    = (n: String, tags: Seq[String]) => tags.exists(t => n.matchesSafely(prefixed(t)))
     }
 
     private def prefixed(n: String) = if (prefix.isEmpty) n else prefix+"."+n

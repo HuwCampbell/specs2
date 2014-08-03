@@ -11,6 +11,7 @@ import scalaz.std.list._
 import data.Processes._
 import control._
 import specification.core._
+import org.specs2.text.Regexes._
 
 /**
  * Selection function for Fragment processes
@@ -32,7 +33,7 @@ trait DefaultSelector extends Selector {
     val regex = env.arguments.ex
     if (regex !=".*")
       process1.filter {
-        case Fragment(Text(t),e,_) if e.isRunnable => t.matches(regex)
+        case Fragment(Text(t),e,_) if e.isRunnable => t matchesSafely regex
         case other                                    => true
       }
     else process1.id
