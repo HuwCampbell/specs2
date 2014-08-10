@@ -2,17 +2,13 @@ package org.specs2
 package reporter
 
 import org.specs2.collection.Seqx
-import org.specs2.execute.Failure
-import org.specs2.execute.Pending
-import org.specs2.execute.Skipped
-import org.specs2.specification.core.SpecificationLink
 import org.specs2.specification.core._
 import data.Fold
 import specification.process.{Stats, Statistics}
 import io.Paths._
 import main.Arguments
-import scala.Some
 import scala.xml.NodeSeq
+import scalaz.stream.Process
 import scalaz.concurrent.Task
 import scalaz.syntax.bind._
 import io._
@@ -25,7 +21,7 @@ import scalaz.std.anyVal._
 import scalaz.syntax.traverse._
 import scalaz.syntax.bind._
 import Actions._
-import html.HtmlTemplate
+import org.specs2.html.HtmlTemplate
 import text.Trim._
 import scala.sys.process.ProcessLogger
 import execute._
@@ -34,6 +30,17 @@ import io.Paths.toPath
 import Seqx._
 
 trait HtmlPrinter extends Printer {
+  def prepare(env: Env, specifications: List[SpecificationStructure]): Action[Unit]  = Actions.unit
+
+  /**
+   * create an index for all the specifications
+   */
+  def finalize(env: Env, specifications: List[SpecificationStructure]): Action[Unit] = for {
+    options   <- getHtmlOptions(env.arguments)
+    htmlPages <- Actions.ok(Indexing.createIndexedPages(env, specifications, options))
+    _         <- Fold.runFold(Process.emitAll(htmlPages), Indexing.indexFold(options.indexFile)).toAction
+  } yield ()
+
   def fold(env: Env, spec: SpecStructure): Fold[Fragment] = new Fold[Fragment] {
     type S = Stats
 
@@ -82,6 +89,7 @@ trait HtmlPrinter extends Printer {
       options.variables
         .updated("body", body)
         .updated("title", spec.wordsTitle)
+        .updated("path", outputFilePath(options.outDir, spec))
         .updated("baseDir", options.baseDir)
         .updated("outDir", options.outDir)
     HtmlTemplate.runTemplate(template, variables1)
@@ -133,16 +141,6 @@ trait HtmlPrinter extends Printer {
   def outputFilePath(directory: String, spec: SpecStructure) =
     directory+spec.specClassName+".html"
 
-  case class HtmlOptions(outDir: String, baseDir: String, template: String, variables: Map[String, String], noStats: Boolean)
-
-  object HtmlOptions {
-    val outDir = "target/specs2-reports/"
-    def template(outDir: String) = outDir+"/templates/specs2.html"
-    val variables = Map[String, String]()
-    val baseDir = "."
-    val noStats = false
-  }
-
   case class Pandoc(executable: String,
                     inputFormat: String,
                     outputFormat: String) {
@@ -188,7 +186,7 @@ trait HtmlPrinter extends Printer {
 
   def copyResources(env: Env, outDir: String): Action[List[Unit]] =
     env.fileSystem.mkdirs(outDir) >>
-    List("css", "javascript", "images", "templates").
+    List("css/", "javascript/", "images/", "templates/").
       map(copySpecResourcesDir(env, "org/specs2/reporter", outDir, classOf[HtmlPrinter].getClassLoader)).sequenceU
 
 

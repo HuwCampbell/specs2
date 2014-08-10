@@ -156,7 +156,7 @@ trait FileSystem {
     mkdirs(dest) >>
       listFiles(src).flatMap { files =>
         files.toList.map { file =>
-          if (file.isDirectory) copyDir(file.getPath, dest)
+          if (file.isDirectory) copyDir(file.getPath, dest+"/"+file.getName)
           else                  copyFile(file.getPath, dest)
         }.sequenceU.void
       }

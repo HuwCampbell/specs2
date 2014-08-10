@@ -1,5 +1,6 @@
 package org.specs2
 
+import scalaz.{Monad, Monoid}
 import scalaz.std.anyVal._
 import scalaz.effect._
 import org.specs2.execute.{AsResult, Result}
@@ -14,7 +15,9 @@ package object control {
   lazy val consoleLogging = (s: String) => IO(println(s))
 
   type Action[A] = ActionT[IO, Unit, Logger, A]
-  object Actions extends ActionTSupport[IO, Unit, Logger]
+  object Actions extends ActionTSupport[IO, Unit, Logger] {
+    def unit: Action[Unit] = empty(implicitly[Monad[IO]], implicitly[Monoid[Unit]])
+  }
 
   /** log a value, using the logger coming from the Reader environment */
   def log[R](r: R): Action[Unit] =
@@ -22,17 +25,17 @@ package object control {
 
   /** log a Throwable with its stacktrace and cause, using the logger coming from the Reader environment */
   def logThrowable(t: Throwable, verbose: Boolean): Action[Unit] =
-    if (verbose) logThrowable(t) else Actions.empty
+    if (verbose) logThrowable(t) else Actions.unit
 
   def logThrowable(t: Throwable): Action[Unit] =
     log(t.getMessage) >>
     log(t.getStackTrace.mkString("\n")) >>
       (if (t.getCause != null) logThrowable(t.getCause)
-       else                    Actions.empty)
+       else                    Actions.unit)
 
   /** log a value, using the logger coming from the Reader environment, only if verbose is true */
   def log[R](r: R, verbose: Boolean): Action[Unit] =
-    if (verbose) log(r) else Actions.empty
+    if (verbose) log(r) else Actions.unit
 
   /**
    * This implicit allows any IO[result] to be used inside an example:

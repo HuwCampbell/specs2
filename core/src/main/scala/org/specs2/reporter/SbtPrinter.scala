@@ -2,6 +2,7 @@ package org.specs2
 package reporter
 
 import data.Fold
+import org.specs2.control.{Actions, Action}
 import scalaz.concurrent.Task
 import scalaz.stream._
 import sbt.testing._
@@ -12,6 +13,9 @@ import main.Arguments
 import specification.core._
 
 trait SbtPrinter extends Printer {
+  def prepare(env: Env, specifications: List[SpecificationStructure]): Action[Unit]  = Actions.unit
+  def finalize(env: Env, specifications: List[SpecificationStructure]): Action[Unit] = Actions.unit
+
   /** sbt loggers to display text */
   def loggers: Array[Logger]
   /** events handler to notify Sbt of successes/failures */

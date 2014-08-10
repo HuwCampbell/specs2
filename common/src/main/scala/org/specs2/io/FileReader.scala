@@ -155,28 +155,11 @@ trait FileReader {
     cons(file, if (file.listFiles == null) empty else file.listFiles.toStream.flatMap(recurse))
   }
 
-  /**
-   * @return the xml content of a file using the Xhtml parser
-   *
-   * if the file contains several nodes, it wraps them up in a single artificial node
-   */
-  def loadXhtmlFile(filePath: String, sourceErrors: Boolean = true) =
-    ???
-//  tryo {
-//    val fileContent = readFile(filePath)
-//    val xhtml = fromString("<e>"+fileContent+"</e>")
-//    (parse(xhtml, sourceErrors)\\"e")(0).child.reduceNodes
-//  }
-
   private[this] def parse(source: Source, sourceErrors: Boolean = true) = {
     if (sourceErrors) XhtmlParser(source)
     else new XhtmlParser(source) {
       override def reportSyntaxError(pos: Int, str: String): Unit = ()
     }.initialize.document
   }
-
-//  def silentLoadXhtmlFileReport          = (e: Exception, filePath: String) => ()
-//  private[this] def defaultLoadXhtmlFileReport = (e: Exception, filePath: String) => { scala.Console.println("trying to load: "+filePath+"\n"); e.printStackTrace }
-
 }
 object FileReader extends FileReader

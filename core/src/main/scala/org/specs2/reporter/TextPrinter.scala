@@ -25,6 +25,8 @@ import execute.FailureDetails
 import specification.process._
 
 trait TextPrinter extends Printer {
+  def prepare(env: Env, specifications: List[SpecificationStructure]): Action[Unit]  = Actions.unit
+  def finalize(env: Env, specifications: List[SpecificationStructure]): Action[Unit] = Actions.unit
 
   def fold(env: Env, spec: SpecStructure) = new Fold[Fragment] {
     // statistics and indentation

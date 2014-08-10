@@ -44,14 +44,15 @@ trait ClassRunner {
   /** report the specification */
   def report(env: Env): SpecificationStructure => Action[Unit] = { spec: SpecificationStructure =>
     val loader = Thread.currentThread.getContextClassLoader
-
     if (env.arguments.commandLine.contains("all")) {
       for {
         printers <- createPrinters(env.arguments, loader)
         ss       <- SpecificationStructure.linkedSpecifications(spec, env, loader)
         sorted   <- safe(SpecificationStructure.topologicalSort(env)(ss).getOrElse(ss) :+ spec)
-        rs = sorted.toList.map(s => Reporter.report(env, printers)(s.structure(env))).sequenceU
-      } yield ()
+        _        <- Reporter.prepare(env, printers)(sorted.toList)
+        rs        = sorted.toList.map(s => Reporter.report(env, printers)(s.structure(env))).sequenceU
+        _        <- Reporter.finalize(env, printers)(sorted.toList)
+      } yield rs
 
     } else
       createPrinters(env.arguments, loader).map(printers => Reporter.report(env, printers)(spec.structure(env))).map(_ => ())
