@@ -52,7 +52,7 @@ trait ClassRunner {
         _        <- Reporter.prepare(env, printers)(sorted.toList)
         rs        = sorted.toList.map(s => Reporter.report(env, printers)(s.structure(env))).sequenceU
         _        <- Reporter.finalize(env, printers)(sorted.toList)
-      } yield rs
+      } yield ()
 
     } else
       createPrinters(env.arguments, loader).map(printers => Reporter.report(env, printers)(spec.structure(env))).map(_ => ())

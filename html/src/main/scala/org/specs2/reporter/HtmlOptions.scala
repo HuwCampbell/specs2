@@ -3,7 +3,7 @@ package org.specs2.reporter
 case class HtmlOptions(outDir: String, baseDir: String, template: String, variables: Map[String, String], noStats: Boolean) {
   def javascriptDir = outDir+"javascript/"
   def indexDir      = javascriptDir+"tipuesearch/"
-  def indexFile     = indexDir+"tipuesearch_contents.js"
+  def indexFile     = indexDir+"tipuesearch_content.js"
 }
 
 object HtmlOptions {
